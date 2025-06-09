@@ -1,36 +1,166 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GrantDraft - 助成金申請書作成SaaS
 
-## Getting Started
+日本屈指の助成金申請書作成支援システム。AIとベクトル検索を活用し、ワンクリックで最適な申請書ドラフトを生成します。
 
-First, run the development server:
+## 主要機能
+
+- 🔐 **セキュアな認証システム** - Supabase Authによるマジックリンク認証
+- 📄 **PDF OCR処理** - アップロードされたPDFから自動的にテキスト抽出
+- 🤖 **AI駆動のドラフト生成** - OpenAI GPTとpgvectorによる類似文書検索
+- ✏️ **リッチテキストエディタ** - TipTapによる高度な編集機能（文字数制限付き）
+- 📑 **PDF出力** - 選択可能なテキストを含む高品質PDFエクスポート
+- 🔒 **エンタープライズセキュリティ** - RLS、暗号化、CSPヘッダー
+
+## 技術スタック
+
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Supabase (Auth, Database, Storage, Edge Functions)
+- **AI/ML**: OpenAI API, pgvector
+- **PDF処理**: pdf-lib, @unstructured-client
+- **エディタ**: TipTap
+
+## セットアップ
+
+### 前提条件
+
+- Node.js 18+
+- npm 9+
+- Supabase CLI
+- OpenAI APIキー
+
+### 1. リポジトリのクローン
+
+```bash
+git clone https://github.com/yourname/grant-draft.git
+cd grant-draft
+```
+
+### 2. 依存関係のインストール
+
+```bash
+npm install --legacy-peer-deps
+```
+
+### 3. 環境変数の設定
+
+`.env.example`を`.env.local`にコピーし、必要な値を設定：
+
+```bash
+cp .env.example .env.local
+```
+
+### 4. Supabaseのセットアップ
+
+```bash
+# Supabase CLIのインストール
+brew install supabase/tap/supabase
+
+# ローカルでSupabaseを起動
+supabase start
+
+# データベースのマイグレーション実行
+supabase db push
+
+# Edge Functionsのデプロイ
+supabase functions deploy
+```
+
+### 5. 開発サーバーの起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 でアプリケーションにアクセスできます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## プロジェクト構造
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+grant-draft/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/               # API Routes
+│   │   ├── auth/              # 認証関連ページ
+│   │   ├── dashboard/         # ダッシュボード
+│   │   └── page.tsx           # ホームページ
+│   ├── components/            # Reactコンポーネント
+│   │   ├── auth/             # 認証コンポーネント
+│   │   ├── editor/           # エディタコンポーネント
+│   │   ├── upload/           # アップロードコンポーネント
+│   │   └── ui/               # shadcn/uiコンポーネント
+│   ├── lib/                   # ユーティリティ関数
+│   │   ├── supabase/         # Supabaseクライアント
+│   │   └── utils.ts          # 共通ユーティリティ
+│   └── types/                 # TypeScript型定義
+├── supabase/
+│   ├── functions/            # Edge Functions
+│   │   ├── ocr_to_md/       # OCR処理
+│   │   ├── embed_doc/       # ベクトル埋め込み
+│   │   ├── generate_draft/  # ドラフト生成
+│   │   └── export_pdf/      # PDF出力
+│   └── migrations/          # データベースマイグレーション
+├── tests/                    # E2Eテスト
+└── public/                   # 静的ファイル
+```
 
-## Learn More
+## 開発コマンド
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# 開発サーバー起動
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# ビルド
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# リント
+npm run lint
 
-## Deploy on Vercel
+# 型チェック
+npm run type-check
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# テスト実行
+npm run test
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# E2Eテスト
+npm run test:e2e
+```
+
+## セキュリティ
+
+- すべてのPIIデータは保存時に暗号化
+- Row Level Security (RLS)によるマルチテナント分離
+- 署名付きURL（5分間有効）によるファイルアクセス制御
+- CSPヘッダーによるXSS対策
+- HSTSによる通信の暗号化強制
+
+## デプロイ
+
+### Vercel
+
+```bash
+# Vercel CLIのインストール
+npm i -g vercel
+
+# デプロイ
+vercel
+```
+
+### Supabase
+
+```bash
+# プロジェクトをリンク
+supabase link --project-ref your-project-ref
+
+# 本番環境へデプロイ
+supabase db push
+supabase functions deploy
+```
+
+## ライセンス
+
+MIT License
+
+## サポート
+
+- Issues: https://github.com/yourname/grant-draft/issues
+- Email: support@grantdraft.jp
